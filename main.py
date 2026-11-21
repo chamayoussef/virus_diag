@@ -2,7 +2,7 @@
 import sys
 from pathlib import Path
 
-from core import Dataset, LogisticRegression, NeuralNetwork
+from core import Dataset, LogisticRegression, NeuralNetwork, KNN
 from pipeline import Trainer, Evaluator
 from app import ClinicalPredictor
 from app.api import FEATURES, diagnose_endpoint
@@ -25,11 +25,12 @@ if __name__ == "__main__":
 
     lr_pred = build(LogisticRegression(), X_train, y_train, X_test, y_test, "Régression logistique")
     nn_pred = build(NeuralNetwork(), X_train, y_train, X_test, y_test, "Réseau de neurones")
+    knn_pred = build(KNN(k=5), X_train, y_train, X_test, y_test, "KNN")
 
     # Même ClinicalPredictor, deux modèles différents (polymorphisme)
     sick = dict(zip(FEATURES, [60, 39.0, 1, 1, 1, 1, 91.0, 4.8, 55.0]))
     healthy = dict(zip(FEATURES, [30, 36.8, 0, 0, 0, 0, 98.0, 7.0, 4.0]))
-    for name, p in [("LogReg", lr_pred), ("NN", nn_pred)]:
+    for name, p in [("LogReg", lr_pred), ("NN", nn_pred), ("KNN", knn_pred)]:
         print(f"\n{name} -> patient fiévreux : {diagnose_endpoint(p, sick)['diagnosis']}"
               f" | patient sain : {diagnose_endpoint(p, healthy)['diagnosis']}")
 
